@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Audio } from 'expo-av';
 
+
 export default function Scan({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -82,7 +83,7 @@ export default function Scan({ navigation }) {
         </View>
       )}
 
-      <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
+      <Button title="Go to Home" onPress={() => navigation.goBack()} />
     </View>
   );
 }

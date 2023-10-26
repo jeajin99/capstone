@@ -1,33 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import "react-native-gesture-handler";
-import {NavigationContainer} from "@react-navigation/native";
-import {createStackNavigator} from "@react-navigation/stack";
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import React from "react";
-
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import InitialScreen from './Intialscreen'; 
 import Scan from './Scan';
-import Home from './Home'
+import LoginScreen from './LoginScreen';
+import RegisterScreen from './RegisterScreen';
+import MainScreen from './MainScreen';
+import { navigationRef } from './NavigationManager'; 
 
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Scanner" component={Scan} />
+    <NavigationContainer ref={navigationRef}>
+      <Stack.Navigator initialRouteName="Initial">
+        <Stack.Screen name="Initial" component={InitialScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Scanner" component={Scan} options={{ headerShown: false }} />
+        <Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}}/>
+        <Stack.Screen name="Register" component={RegisterScreen} options={{headerShown: false}}/>
+        <Stack.Screen name='Mains' component={MainScreen} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+};
