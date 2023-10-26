@@ -4,9 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 
 
 const LoginScreen = () => {
-    const navigation = useNavigation(); // navigation 객체 생성
+    const navigation = useNavigation(); 
 
-            // 뒤로가기 함수
             const goBack = () => {
             navigation.goBack();
             };
@@ -48,7 +47,7 @@ const styles = {
     container: {
       flex: 1,
       backgroundColor: '#ffffff',
-      paddingHorizontal: 20,
+      paddingHorizontal: 10,
       paddingVertical: 20,
     },
     goBackButtonContainer: {
@@ -57,6 +56,7 @@ const styles = {
     },
     goBackButtonText: {
       fontSize: 40,
+      fontWeight: 'bold'
     },
     formArea: {
       flex: 3,
@@ -80,7 +80,7 @@ const styles = {
       width: 250,
       borderRadius: 10,
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     buttonText: {
       color: '#fff',

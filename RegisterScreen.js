@@ -67,7 +67,7 @@ const styles = {
     container: {
       flex: 1,
       backgroundColor: '#ffffff',
-      paddingHorizontal: 20,
+      paddingHorizontal: 10,
       paddingVertical: 20,
     },
     goBackButtonContainer: {
@@ -76,6 +76,7 @@ const styles = {
     },
     goBackButtonText: {
       fontSize: 40,
+      fontWeight: 'bold'
     },
     formArea: {
       flex: 3,

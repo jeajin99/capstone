@@ -6,6 +6,7 @@ import Scan from './Scan';
 import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
 import MainScreen from './MainScreen';
+import SearchScreen from './SearchScreen'
 import { navigationRef } from './NavigationManager'; 
 
 const Stack = createStackNavigator();
@@ -19,6 +20,7 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}}/>
         <Stack.Screen name="Register" component={RegisterScreen} options={{headerShown: false}}/>
         <Stack.Screen name='Mains' component={MainScreen} options={{headerShown: false}}/>
+        <Stack.Screen name='Search' component={SearchScreen} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
