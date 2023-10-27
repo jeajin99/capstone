@@ -1,12 +1,12 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import InitialScreen from './Intialscreen'; 
-import Scan from './Scan';
-import LoginScreen from './LoginScreen';
-import RegisterScreen from './RegisterScreen';
-import MainScreen from './MainScreen';
-import SearchScreen from './SearchScreen'
+import InitialScreen from './Screen/Intialscreen'; 
+import Scan from './Screen/Scan';
+import LoginScreen from './Screen/LoginScreen';
+import RegisterScreen from './Screen/RegisterScreen';
+import MainScreen from './Screen/MainScreen';
+import SearchScreen from './Screen/SearchScreen'
 import { navigationRef } from './NavigationManager'; 
 
 const Stack = createStackNavigator();

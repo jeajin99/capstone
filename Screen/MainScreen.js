@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import RoundButton from './RoundButton';
+import RoundButton from '../RoundButton';
 
 const MainScreen = () => {
     const navigation = useNavigation();
@@ -18,7 +18,7 @@ const MainScreen = () => {
                 <TouchableOpacity onPress={Searchbt}>
                     <Image 
                       style={Styles.search} 
-                      source={require('./assets/search.png')} 
+                      source={require('../assets/search.png')} 
                     />
                 </TouchableOpacity>
             </View>
@@ -60,8 +60,8 @@ const Styles = StyleSheet.create({
     },  
     horizontalLine: {
       height: 0.5, 
-      backgroundColor: '#000', // 선의 색상
-      marginVertical: 10, // 선 위아래 여백 조절
+      backgroundColor: '#000', 
+      marginVertical: 10 
   }
 });
 

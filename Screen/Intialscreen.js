@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { navigate } from './NavigationManager';
+import { navigate } from '../NavigationManager';
 
 const InitialScreen = () => {
   return (
