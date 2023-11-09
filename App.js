@@ -9,6 +9,14 @@ import MainScreen from './Screen/MainScreen';
 import SearchScreen from './Screen/SearchScreen'
 import { navigationRef } from './NavigationManager'; 
 
+
+import firebase from 'firebase/app'; //없으면 안됌
+import 'firebase/auth';        //없으면 안됌
+import 'firebase/firestore';  //없으면 안됌
+import firebaseConfig from './FirebaseConfig'; //없으면 안됌
+
+
+
 const Stack = createStackNavigator();
 
 export default function App() {
