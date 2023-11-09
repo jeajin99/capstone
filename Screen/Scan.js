@@ -2,11 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Audio } from 'expo-av';
+import CustomAlert from '../CustomAlert';
 
+const REST_API_KEY = 'f98ace30dbf14b9bbcbc';
+const OPENAPI_URL = 'http://openapi.foodsafetykorea.go.kr/api/';
 
 export default function Scan({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
+  const [isAlertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  const showAlert = (message) => {
+    setAlertMessage(message);
+    setAlertVisible(true);
+  };
+
+  const hideAlert = () => {
+    setAlertVisible(false);
+  };
 
   useEffect(() => {
     (async () => {
@@ -19,48 +33,46 @@ export default function Scan({ navigation }) {
     setScanned(true);
     const soundObject = new Audio.Sound();
     try {
-      await soundObject.loadAsync(require('./assets/Sound/barcode.mp3'));
+      await soundObject.loadAsync(require('../assets/Sound/barcode.mp3'));
       await soundObject.playAsync();
     } catch (error) {
-      console.error('Error loading sound:', error);
+      console.error('사운드 로딩중 에러:', error);
     }
     try {
       const result = await getdata(data);
-  
+
       if (result.error) {
-        alert(`Bar code data ${data} has been scanned, but there was an error: ${result.error}`);
+        showAlert(`Bar code data ${data} has been scanned, but there was an error: ${result.error}`);
       } else {
-        alert(`Bar code data ${data} has been scanned!\n Result from API: ${result.prnm} and ${result.deadline}`);
+        // navigation을 통해 MainScreen으로 데이터 전달
+        navigation.navigate('Mains', { barcodeData: { data, ...result } });
       }
     } catch (error) {
-      console.error('Error fetching data from API:', error);
+      console.error('식별되지 않는 바코드 번호', error);
+      showAlert('식별되지 않는 바코드 번호입니다.');
     }
   };
-  
+
   // API key -> f98ace30dbf14b9bbcbc
   const getdata = async (qrvalue) => {
     const response = await fetch(
-      'http://openapi.foodsafetykorea.go.kr/api/' +
-      'f98ace30dbf14b9bbcbc' +
-        '/C005/json/1/5/BAR_CD=' +
+      OPENAPI_URL + REST_API_KEY + '/C005/json/1/5/BAR_CD=' +
         qrvalue,
       {
         method: 'GET',
       }
     );
-  
+
     if (response.status === 200) {
       const responseJson = await response.json();
       const prnm = responseJson.C005.row[0].PRDLST_NM;
-      const deadline = responseJson.C005.row[0].POG_DAYCNT; // Add more values as needed
-  
+      const deadline = responseJson.C005.row[0].POG_DAYCNT;
       return { prnm, deadline };
     } else {
       return { error: 'There was an error' };
     }
   };
-  
-  
+
   if (hasPermission === null) {
     return <Text>Requesting camera permission</Text>;
   }
@@ -83,7 +95,7 @@ export default function Scan({ navigation }) {
         </View>
       )}
 
-      <Button title="Go to Home" onPress={() => navigation.goBack()} />
+      <CustomAlert isVisible={isAlertVisible} onClose={hideAlert} message={alertMessage} />
     </View>
   );
 }

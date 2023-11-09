@@ -10,10 +10,10 @@ import SearchScreen from './Screen/SearchScreen'
 import { navigationRef } from './NavigationManager'; 
 
 
-import firebase from 'firebase/app'; //없으면 안됌
-import 'firebase/auth';        //없으면 안됌
-import 'firebase/firestore';  //없으면 안됌
-import firebaseConfig from './FirebaseConfig'; //없으면 안됌
+import firebase from 'firebase/app';
+import 'firebase/auth';        
+import 'firebase/firestore';  
+import firebaseConfig from './FirebaseConfig'; 
 
 
 

@@ -8,6 +8,7 @@ import {getAuth, signInWithEmailAndPassword} from 'firebase/auth';
 export async function signin(email, password) {
   
   try {
+    const auth = getAuth();
     await firebase.auth().signInWithEmailAndPassword(email, password)
     return true; 
   }catch (error) {

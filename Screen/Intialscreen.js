@@ -3,34 +3,49 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { navigate } from '../NavigationManager';
 
 const InitialScreen = () => {
+  const handleNavigation = (screen) => {
+    navigate(screen);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.topLogo}>
-        <Text style={styles.logo}>
-          Barcoding
-        </Text>
-        <Text style={styles.memo}>
-          소비를 기록하다.
-        </Text>
+        <Text style={styles.logo}>Barcoding</Text>
+        <Text style={styles.memo}>소비를 기록하다.</Text>
       </View>
       <View style={styles.button}>
-        <TouchableOpacity style={[styles.buttonContainer, styles.loginButton]} onPress={() => navigate('Login')}>
-          <Text style={styles.buttonText}>로그인</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.buttonContainer, styles.registerButton]} onPress={() => navigate('Register')}>
-          <Text style={[styles.buttonText, styles.register]}>회원가입</Text>
-        </TouchableOpacity>
+        <CustomButton
+          title="로그인"
+          onPress={() => handleNavigation('Login')}
+          buttonStyle={styles.loginButton}
+        />
+        <CustomButton
+          title="회원가입"
+          onPress={() => handleNavigation('Register')}
+          buttonStyle={[styles.registerButton, { marginTop: 10 }]}
+          textStyle={styles.register}
+        />
       </View>
     </View>
   );
 };
+
+const CustomButton = ({ title, onPress, buttonStyle, textStyle }) => (
+  <TouchableOpacity style={[styles.buttonContainer, buttonStyle]} onPress={onPress}>
+    <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+  </TouchableOpacity>
+);
+
 const styles = StyleSheet.create({
-  topLogo: {
-    marginTop: 150,
-  },
-  button: {
+  container: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  topLogo: {
+    marginTop: 120,
+  },
+  button: {
     marginTop: 80,
   },
   logo: {
@@ -57,15 +72,14 @@ const styles = StyleSheet.create({
   },
   registerButton: {
     backgroundColor: 'black',
-    marginTop: 10,
   },
   buttonText: {
     fontSize: 20,
     fontWeight: 'bold',
   },
   register: {
-    color: 'white'
-  }
+    color: 'white',
+  },
 });
 
 export default InitialScreen;
