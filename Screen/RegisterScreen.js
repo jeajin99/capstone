@@ -28,7 +28,7 @@ const RegisterScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.topLogo}>
-        <Text style={styles.logo}>Singup</Text>
+        <Text style={styles.logo}>Register</Text>
       </View>
       <View style={styles.formArea}>
         <TextInput

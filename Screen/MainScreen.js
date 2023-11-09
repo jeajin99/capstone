@@ -50,7 +50,7 @@ const ScannedItemList = ({ scannedItems }) => (
     <View style={Styles.scannedItem}>
       <View style={Styles.itemInfo}>
         <Text style={Styles.prnm}>{`${item.prnm}`}</Text>
-        <Text style={Styles.deadline}>{`유통 기한 ${item.deadline}`}</Text>
+        <Text style={Styles.deadline}>{`${item.deadline}`}</Text>
         <Text>{`${item.data}`}</Text>
       </View>
       <Image
@@ -96,12 +96,17 @@ const Styles = StyleSheet.create({
     backgroundColor: '#000',
     marginVertical: 10,
   },
-scannedItem: {
+  scannedItem: {
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+  },scannedItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 2,
-    padding: 2,
+    marginVertical: 10,
+    padding: 10,
     backgroundColor: '#f0f0f0',
     borderRadius: 8,
   },
@@ -118,7 +123,7 @@ scannedItem: {
     fontWeight: 'bold',
   },
   deadline:{
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
   }
 });
 

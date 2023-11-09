@@ -1,5 +1,7 @@
+// Scan.js
+
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Audio } from 'expo-av';
 import CustomAlert from '../CustomAlert';
@@ -7,11 +9,12 @@ import CustomAlert from '../CustomAlert';
 const REST_API_KEY = 'f98ace30dbf14b9bbcbc';
 const OPENAPI_URL = 'http://openapi.foodsafetykorea.go.kr/api/';
 
-export default function Scan({ navigation }) {
+export default function Scan({ navigation, route }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [isAlertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [key, setKey] = useState(0); // 추가된 부분
 
   const showAlert = (message) => {
     setAlertMessage(message);
@@ -29,6 +32,13 @@ export default function Scan({ navigation }) {
     })();
   }, []);
 
+  useEffect(() => {
+    if (route.params?.scanned) {
+      setScanned(false);
+      setKey((prevKey) => prevKey + 1); // 변경된 부분
+    }
+  }, [route.params?.scanned]);
+
   const handleBarCodeScanned = async ({ data }) => {
     setScanned(true);
     const soundObject = new Audio.Sound();
@@ -44,8 +54,7 @@ export default function Scan({ navigation }) {
       if (result.error) {
         showAlert(`Bar code data ${data} has been scanned, but there was an error: ${result.error}`);
       } else {
-        // navigation을 통해 MainScreen으로 데이터 전달
-        navigation.navigate('Mains', { barcodeData: { data, ...result } });
+        navigation.navigate('Productregist', { barcodeData: { data, ...result, scanned: false } });
       }
     } catch (error) {
       console.error('식별되지 않는 바코드 번호', error);
@@ -53,11 +62,9 @@ export default function Scan({ navigation }) {
     }
   };
 
-  // API key -> f98ace30dbf14b9bbcbc
   const getdata = async (qrvalue) => {
     const response = await fetch(
-      OPENAPI_URL + REST_API_KEY + '/C005/json/1/5/BAR_CD=' +
-        qrvalue,
+      OPENAPI_URL + REST_API_KEY + '/C005/json/1/5/BAR_CD=' + qrvalue,
       {
         method: 'GET',
       }
@@ -83,14 +90,15 @@ export default function Scan({ navigation }) {
   return (
     <View style={styles.container}>
       <BarCodeScanner
+        key={key} 
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />
       {scanned && (
         <View style={styles.scanAgain}>
-          <Text>Scan again?</Text>
+          <Text>스캔</Text>
           <Text style={styles.scanAgainText} onPress={() => setScanned(false)}>
-            Tap Here
+            다시하기
           </Text>
         </View>
       )}
