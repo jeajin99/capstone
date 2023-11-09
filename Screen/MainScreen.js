@@ -114,8 +114,8 @@ const Styles = StyleSheet.create({
     flex: 1,
   },
   itemImage: {
-    width: 100, // 이미지의 너비 조정
-    height: 100, // 이미지의 높이 조정
+    width: 80, // 이미지의 너비 조정
+    height: 80, // 이미지의 높이 조정
     borderRadius: 25, // 원형 이미지로 보이도록 설정
   },
   prnm: {
