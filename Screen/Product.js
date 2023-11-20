@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import 'firebase/compat/firestore';
 import { useRoute } from '@react-navigation/native';
 
 const ProductRegist = ({ route, navigation }) => {
   const [productName, setProductName] = useState(route.params.barcodeData.prnm || '');
   const [expiryDate, setExpiryDate] = useState(route.params.barcodeData.deadline || '');
-
+  const [categ, setCate] = useState('');
   const handleRegistration = async () => {
     try {
       await AsyncStorage.setItem('productName', productName);
@@ -14,14 +17,23 @@ const ProductRegist = ({ route, navigation }) => {
     } catch (e) {
       console.error('Error saving data to AsyncStorage:', e);
     }
-
-    navigation.navigate('Mains', {
-      barcodeData: {
-        data: route.params.barcodeData.data,
-        prnm: productName,
-        deadline: expiryDate,
-      },
-    });
+    const currentUser = firebase.auth().currentUser;
+    const db = firebase.firestore();
+    db.collection("users")
+        .doc(currentUser.uid)
+        .collection("product")
+        .doc("cate")
+        .collection(categ)
+        .add({
+            prname : productName,
+            brnum : route.params.barcodeData.data,
+            deadline : expiryDate,
+            cate : categ
+        });
+    setTimeout(() => {
+      Alert.alert("등록 성공!");
+      navigation.navigate('Mains');
+    }, 2000);
   };
   const handleScanAgain = () => {
     navigation.replace('Scanner', { scanned: false });
@@ -40,6 +52,12 @@ const ProductRegist = ({ route, navigation }) => {
         placeholder="유통기한"
         value={expiryDate}
         onChangeText={(text) => setExpiryDate(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="카테고리"
+        value={categ}
+        onChangeText={(text) => setCate(text)}
       />
       <View style={styles.buttonArea}>
         <TouchableOpacity style={styles.button} onPress={handleRegistration}>

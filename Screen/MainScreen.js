@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import RoundButton from '../RoundButton';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
 const MainScreen = () => {
   const navigation = useNavigation();
@@ -12,10 +14,35 @@ const MainScreen = () => {
     if (route.params?.barcodeData) {
       setScannedItems(prevItems => [...prevItems, route.params.barcodeData]);
     }
+    fetchProductDataFromFirestore();
   }, [route.params?.barcodeData]);
 
   const Searchbt = () => {
     navigation.navigate('Search');
+  };
+
+  const fetchProductDataFromFirestore = async () => {
+    try {
+      const currentUser = firebase.auth().currentUser;
+      const db = firebase.firestore();
+      const productsRef = db.collection("users").doc(currentUser.uid).collection("product").doc(categ);
+
+      const querySnapshot = await productsRef.get();
+      const products = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        products.push({
+          prnm: data.prname,
+          data: data.brnum,
+          deadline: data.deadline,
+        });
+      });
+
+      setScannedItems(products);
+    } catch (error) {
+      console.error('Firestore에서 데이터를 가져오는 중 오류 발생:', error);
+    }
   };
 
   return (
@@ -47,20 +74,22 @@ const ScannedItemList = ({ scannedItems }) => (
     data={scannedItems}
     keyExtractor={(item, index) => index.toString()}
     renderItem={({ item }) => (
-    <View style={Styles.scannedItem}>
-      <View style={Styles.itemInfo}>
-        <Text style={Styles.prnm}>{`${item.prnm}`}</Text>
-        <Text style={Styles.deadline}>{`${item.deadline}`}</Text>
-        <Text>{`${item.data}`}</Text>
+      <View style={Styles.scannedItem}>
+        <View style={Styles.itemInfo}>
+          <Text style={Styles.deadline}>{`${item.deadline}`}</Text>
+          <Text style={Styles.prnm}>{`${item.prnm}`}</Text>
+          <Text>{`${item.data}`}</Text>
+        </View>
+        {/* 원하는 이미지 소스를 설정하세요 */}
+        <Image
+          style={Styles.itemImage}
+          source={require('../assets/post.png')}
+        />
       </View>
-      <Image
-        style={Styles.itemImage}
-        source={require('../assets/post.png')} // 이미지 경로를 정확하게 입력해주세요.
-      />
-    </View>
     )}
   />
 );
+
 
 const Styles = StyleSheet.create({
   container: {
@@ -114,15 +143,16 @@ const Styles = StyleSheet.create({
     flex: 1,
   },
   itemImage: {
-    width: 80, // 이미지의 너비 조정
-    height: 80, // 이미지의 높이 조정
-    borderRadius: 25, // 원형 이미지로 보이도록 설정
+    width: 80, 
+    height: 80, 
+    borderRadius: 25, 
   },
   prnm: {
-    fontSize: 15,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   deadline:{
+    fontSize: 12,
     textDecorationLine: 'underline',
   }
 });
