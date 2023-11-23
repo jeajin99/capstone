@@ -50,7 +50,7 @@ const ProductRegist = ({ route, navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="유통기한"
-        value={expiryDate}
+        value={""}
         onChangeText={(text) => setExpiryDate(text)}
       />
       <TextInput

@@ -9,23 +9,33 @@ const MainScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const [scannedItems, setScannedItems] = useState([]);
-
+  const [selectedCategory, setSelectedCategory] = useState('식품'); 
+  
   useEffect(() => {
     if (route.params?.barcodeData) {
       setScannedItems(prevItems => [...prevItems, route.params.barcodeData]);
     }
-    fetchProductDataFromFirestore();
-  }, [route.params?.barcodeData]);
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchProductDataFromFirestore();
+    });
+
+    return unsubscribe;
+  }, [route.params?.barcodeData, selectedCategory, navigation]);
 
   const Searchbt = () => {
     navigation.navigate('Search');
   };
 
-  const fetchProductDataFromFirestore = async () => {
+  const updateSelectedCategory = (newCategory) => {
+    setSelectedCategory(newCategory);
+    fetchProductDataFromFirestore(newCategory);
+  };
+
+  const fetchProductDataFromFirestore = async (category = selectedCategory) => {
     try {
       const currentUser = firebase.auth().currentUser;
       const db = firebase.firestore();
-      const productsRef = db.collection("users").doc(currentUser.uid).collection("product").doc(categ);
+      const productsRef = db.collection("users").doc(currentUser.uid).collection("product").doc("cate").collection(category);
 
       const querySnapshot = await productsRef.get();
       const products = [];
@@ -47,7 +57,7 @@ const MainScreen = () => {
 
   return (
     <View style={Styles.container}>
-      <Header onSearchPress={Searchbt} />
+      <Header onSearchPress={Searchbt} selectedCategory={selectedCategory} />
       <View style={Styles.horizontalLine} />
       <ScannedItemList scannedItems={scannedItems} />
       <RoundButton onPress={() => navigation.navigate('Scanner')} />
@@ -55,11 +65,11 @@ const MainScreen = () => {
   );
 };
 
-const Header = ({ onSearchPress }) => (
+const Header = ({ onSearchPress, selectedCategory, categories, onSelectCategory }) => (
   <View style={Styles.topRow}>
-    <View style={Styles.logoContainer}>
-      <Text style={Styles.logo}>Categorie</Text>
-    </View>
+    <TouchableOpacity onPress={() => onSelectCategory(category)}>
+      <Text style={Styles.logo}>{selectedCategory}</Text>
+    </TouchableOpacity>
     <TouchableOpacity onPress={onSearchPress}>
       <Image
         style={Styles.search}
@@ -80,16 +90,15 @@ const ScannedItemList = ({ scannedItems }) => (
           <Text style={Styles.prnm}>{`${item.prnm}`}</Text>
           <Text>{`${item.data}`}</Text>
         </View>
-        {/* 원하는 이미지 소스를 설정하세요 */}
         <Image
           style={Styles.itemImage}
           source={require('../assets/post.png')}
         />
       </View>
     )}
+    ItemSeparatorComponent={() => <View style={Styles.itemSeparator} />}
   />
 );
-
 
 const Styles = StyleSheet.create({
   container: {
@@ -100,6 +109,7 @@ const Styles = StyleSheet.create({
   },
   topRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between', 
     alignItems: 'center',
     marginTop: 20,
   },
@@ -126,18 +136,16 @@ const Styles = StyleSheet.create({
     marginVertical: 10,
   },
   scannedItem: {
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-  },scannedItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 10,
     padding: 10,
     backgroundColor: '#f0f0f0',
     borderRadius: 8,
+  },
+  itemSeparator: {
+    height: 1,
+    backgroundColor: '#000'
   },
   itemInfo: {
     flex: 1,
