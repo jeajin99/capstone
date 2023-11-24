@@ -9,8 +9,8 @@ const MainScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const [scannedItems, setScannedItems] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('식품'); 
-  
+  const [selectedCategory, setSelectedCategory] = useState('식품');
+
   useEffect(() => {
     if (route.params?.barcodeData) {
       setScannedItems(prevItems => [...prevItems, route.params.barcodeData]);
@@ -31,22 +31,51 @@ const MainScreen = () => {
     fetchProductDataFromFirestore(newCategory);
   };
 
+  const getcate = async () => {
+    try {
+      const currentUser = firebase.auth().currentUser;
+      const db = firebase.firestore();
+
+      const catename = db
+        .collection("users")
+        .doc(currentUser.uid)
+        .collection("product")
+        .doc("cate")
+
+      const querySnapshot = await catename.get();
+      const products = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          category: data.cate,
+        };
+      });
+
+      setScannedItems(products);
+    } catch (error) {
+      console.error('Firestore에서 데이터를 가져오는 중 오류 발생:', error);
+    }
+  };
+
   const fetchProductDataFromFirestore = async (category = selectedCategory) => {
     try {
       const currentUser = firebase.auth().currentUser;
       const db = firebase.firestore();
-      const productsRef = db.collection("users").doc(currentUser.uid).collection("product").doc("cate").collection(category);
+
+      const productsRef = db
+        .collection("users")
+        .doc(currentUser.uid)
+        .collection("product")
+        .doc("cate")
+        .collection(category);
 
       const querySnapshot = await productsRef.get();
-      const products = [];
-
-      querySnapshot.forEach((doc) => {
+      const products = querySnapshot.docs.map(doc => {
         const data = doc.data();
-        products.push({
+        return {
           prnm: data.prname,
           data: data.brnum,
           deadline: data.deadline,
-        });
+        };
       });
 
       setScannedItems(products);
@@ -56,23 +85,23 @@ const MainScreen = () => {
   };
 
   return (
-    <View style={Styles.container}>
-      <Header onSearchPress={Searchbt} selectedCategory={selectedCategory} />
-      <View style={Styles.horizontalLine} />
+    <View style={styles.container}>
+      <Header onSearchPress={Searchbt} selectedCategory={selectedCategory} onSelectCategory={updateSelectedCategory} />
+      <View style={styles.horizontalLine} />
       <ScannedItemList scannedItems={scannedItems} />
       <RoundButton onPress={() => navigation.navigate('Scanner')} />
     </View>
   );
 };
 
-const Header = ({ onSearchPress, selectedCategory, categories, onSelectCategory }) => (
-  <View style={Styles.topRow}>
-    <TouchableOpacity onPress={() => onSelectCategory(category)}>
-      <Text style={Styles.logo}>{selectedCategory}</Text>
+const Header = ({ onSearchPress, selectedCategory, onSelectCategory }) => (
+  <View style={styles.topRow}>
+    <TouchableOpacity onPress={() => onSelectCategory(selectedCategory)}>
+      <Text style={styles.logo}>{selectedCategory}</Text>
     </TouchableOpacity>
     <TouchableOpacity onPress={onSearchPress}>
       <Image
-        style={Styles.search}
+        style={styles.search}
         source={require('../assets/search.png')}
       />
     </TouchableOpacity>
@@ -84,23 +113,24 @@ const ScannedItemList = ({ scannedItems }) => (
     data={scannedItems}
     keyExtractor={(item, index) => index.toString()}
     renderItem={({ item }) => (
-      <View style={Styles.scannedItem}>
-        <View style={Styles.itemInfo}>
-          <Text style={Styles.deadline}>{`${item.deadline}`}</Text>
-          <Text style={Styles.prnm}>{`${item.prnm}`}</Text>
+      <View style={styles.scannedItem}>
+        <View style={styles.itemInfo}>
+          <Text style={styles.deadline}>{`${item.deadline}`}</Text>
+          <Text style={styles.prnm}>{`${item.prnm}`}</Text>
           <Text>{`${item.data}`}</Text>
         </View>
         <Image
-          style={Styles.itemImage}
+          style={styles.itemImage}
           source={require('../assets/post.png')}
         />
       </View>
     )}
-    ItemSeparatorComponent={() => <View style={Styles.itemSeparator} />}
+    ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+    showsVerticalScrollIndicator={false}
   />
 );
 
-const Styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
@@ -109,15 +139,9 @@ const Styles = StyleSheet.create({
   },
   topRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 20,
-  },
-  logoContainer: {
-    flex: 1,
-  },
-  imageContainer: {
-    marginLeft: 10,
   },
   logo: {
     fontSize: 40,
@@ -126,9 +150,6 @@ const Styles = StyleSheet.create({
   search: {
     width: 30,
     height: 30,
-  },
-  HomeText: {
-    marginTop: 20,
   },
   horizontalLine: {
     height: 0.5,
@@ -140,8 +161,7 @@ const Styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
+    borderRadius: 0,
   },
   itemSeparator: {
     height: 1,
@@ -151,15 +171,15 @@ const Styles = StyleSheet.create({
     flex: 1,
   },
   itemImage: {
-    width: 80, 
-    height: 80, 
-    borderRadius: 25, 
+    width: 80,
+    height: 80,
+    borderRadius: 25,
   },
   prnm: {
     fontSize: 20,
     fontWeight: 'bold',
   },
-  deadline:{
+  deadline: {
     fontSize: 12,
     textDecorationLine: 'underline',
   }
