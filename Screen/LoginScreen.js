@@ -8,16 +8,15 @@ const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
 
-            const goBack = () => {
-            navigation.goBack();
-            };
+  const goBack = () => {
+    navigation.goBack();
+    };
 
-            const handleLogin = async () => {
-              const success = await signin(email, password);
-              if (success) {
-                navigation.navigate("Bottom")}
-              }
-        
+    const handleLogin = async () => {
+      const success = await signin(email, password);
+      if (success) {
+        navigation.navigate("Mains")}
+      }
         return (
             <View style={styles.container}>
                 <View style={styles.goBackButtonContainer}>

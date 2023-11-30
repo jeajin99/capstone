@@ -5,8 +5,7 @@ import RoundButton from '../RoundButton';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import dayjs from 'dayjs';
-import { schedulePushNotification } from '../Notification';
-
+import { schedulePushNotification } from '../Notification'
 
 
 const MainScreen = () => {
@@ -34,6 +33,7 @@ const MainScreen = () => {
     setSelectedCategory(newCategory);
     fetchProductDataFromFirestore(newCategory);
   };
+
 
   const deleteItem = (docId) => {
     Alert.alert(
@@ -78,6 +78,8 @@ const MainScreen = () => {
       console.error('데이터 삭제 실패:', error);
     }
   };
+
+
 
   const  fetchProductDataAndScheduleNotifications = async (category = selectedCategory) => {
     try {
@@ -132,9 +134,9 @@ const MainScreen = () => {
   
 
   return (
-    <View style={Styles.container}>
+    <View style={styles.container}>
       <Header onSearchPress={Searchbt} selectedCategory={selectedCategory} onSelectCategory={updateSelectedCategory} />
-      <View style={Styles.horizontalLine} />
+      <View style={styles.horizontalLine} />
       <ScannedItemList scannedItems={scannedItems} onDeleteItem = {deleteItem} />
       <RoundButton onPress={() => navigation.navigate('Scanner')} />
     </View>
@@ -143,154 +145,137 @@ const MainScreen = () => {
 };
 
 const Header = ({ onSearchPress, selectedCategory, categories, onSelectCategory }) => (
-  <View style={Styles.topRow}>
+  <View style={styles.topRow}>
     <TouchableOpacity onPress={() => onSelectCategory(category)}>
-      <Text style={Styles.logo}>{selectedCategory}</Text>
+      <Text style={styles.logo}>{selectedCategory}</Text>
     </TouchableOpacity>
     <TouchableOpacity onPress={onSearchPress}>
       <Image
-        style={Styles.search}
+        style={styles.search}
         source={require('../assets/search.png')}
       />
     </TouchableOpacity>
   </View>
 );
 
-const calculateDday = (deadline) => {
-  const today = new Date();
-  const year = parseInt(deadline.substring(0, 4), 10);
-  const month = parseInt(deadline.substring(4, 6), 10) - 1;
-  const day = parseInt(deadline.substring(6, 8), 10);
-
-  const deadlineDate = new Date(year, month, day);
-
-  if (isNaN(deadlineDate.getTime())) {
-    console.error('Invalid deadline date:', deadline);
-    return 'Invalid Date';
-  }
-
-  const timeDiff = deadlineDate - today;
-  const dayDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-  return dayDiff;
-};
 
 const ScannedItemList = ({ scannedItems, onDeleteItem }) => (
-  <FlatList
-    data={scannedItems}
-    keyExtractor={(item, index) => item.docId}
-    renderItem={({ item }) => {
-      const dday = calculateDday(item.deadline);
-      const indicatorColor = getIndicatorColor(dday);
-      const deadlineText = getDeadlineText(dday);
-      return (
-        <TouchableOpacity onLongPress={() => onDeleteItem(item.docId)}>
-        <View style={Styles.scannedItem}>
-          <View style={[Styles.indicator, { backgroundColor: indicatorColor }]} />
-          <View style={Styles.itemInfo}>
-            <Text style={Styles.deadline}>{`${item.deadline}`}</Text>
-            <Text style={Styles.prnm}>{`${item.prnm}`}</Text>
-            <Text>{`${item.data}`}</Text>
-            <Text style={Styles.deadlinetext}>{deadlineText}</Text>
+    <FlatList
+      data={scannedItems}
+      keyExtractor={(item, index) => item.docId}
+      renderItem={({ item }) => {
+        const dday = calculateDday(item.deadline);
+        const indicatorColor = getIndicatorColor(dday);
+        const deadlineText = getDeadlineText(dday);
+        return (
+          <TouchableOpacity onLongPress={() => onDeleteItem(item.docId)}>
+          <View style={Styles.scannedItem}>
+            <View style={[Styles.indicator, { backgroundColor: indicatorColor }]} />
+            <View style={Styles.itemInfo}>
+              <Text style={Styles.deadline}>{`${item.deadline}`}</Text>
+              <Text style={Styles.prnm}>{`${item.prnm}`}</Text>
+              <Text>{`${item.data}`}</Text>
+              <Text style={Styles.deadlinetext}>{deadlineText}</Text>
+            </View>
+            <Image style={Styles.itemImage} source={require('../assets/post.png')} />
           </View>
-          <Image style={Styles.itemImage} source={require('../assets/post.png')} />
-        </View>
-      </TouchableOpacity>
-      );
-    }}
-    ItemSeparatorComponent={() => <View style={Styles.itemSeparator} />}
-  />
-);
+        </TouchableOpacity>
+        );
+      }}
+      ItemSeparatorComponent={() => <View style={Styles.itemSeparator} />}
+    />
+  );
 
 const getDeadlineText = (dday) => {
-  if (dday < 0) {
-    return '유통기한 만료';
-  } else {
-    return `${dday}일 남았습니다`;
-  }
-};
-
-const getIndicatorColor = (dday) => {
-  if (dday < 0) {
-    return '#FF0000'; 
-  } else if (dday <= 10) {
-    return '#FFD700'; 
-  } else {
-    return '#147814'; 
-  }
-};
-
-const Styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 6,
-    paddingVertical: 20,
-  },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  logoContainer: {
-    flex: 1,
-  },
-  imageContainer: {
-    marginLeft: 10,
-  },
-  logo: {
-    fontSize: 40,
-    fontWeight: 'bold',
-  },
-  search: {
-    width: 30,
-    height: 30,
-  },
-  HomeText: {
-    marginTop: 20,
-  },
-  horizontalLine: {
-    height: 0.5,
-    backgroundColor: '#000',
-    marginVertical: 10,
-  },
-  scannedItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#FFFFFF', 
-    borderRadius: 8,
-  },
-  indicator: {
-    width: 10,
-    height: '100%', 
-    marginRight: 10,
-    borderRadius: 5, 
-  },
-  itemSeparator: {
-    height: 1,
-    backgroundColor: '#000'
-  },
-  itemInfo: {
-    flex: 1,
-  },
-  itemImage: {
-    width: 80, 
-    height: 80, 
-    borderRadius: 25, 
-  },
-  prnm: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  deadline:{
-    fontSize: 12,
-    textDecorationLine: 'underline',
-  },
-  deadlinetext:{
-    fontWeight: 'bold',
-  }
-});
-
-export default MainScreen;
+    if (dday < 0) {
+      return '유통기한 만료';
+    } else {
+      return `${dday}일 남았습니다`;
+    }
+  };
+  
+  const getIndicatorColor = (dday) => {
+    if (dday < 0) {
+      return '#FF0000'; 
+    } else if (dday <= 10) {
+      return '#FFD700'; 
+    } else {
+      return '#147814'; 
+    }
+  };
+  
+  const Styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#ffffff',
+      paddingHorizontal: 6,
+      paddingVertical: 20,
+    },
+    topRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    logoContainer: {
+      flex: 1,
+    },
+    imageContainer: {
+      marginLeft: 10,
+    },
+    logo: {
+      fontSize: 40,
+      fontWeight: 'bold',
+    },
+    search: {
+      width: 30,
+      height: 30,
+    },
+    HomeText: {
+      marginTop: 20,
+    },
+    horizontalLine: {
+      height: 0.5,
+      backgroundColor: '#000',
+      marginVertical: 10,
+    },
+    scannedItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 10,
+      backgroundColor: '#FFFFFF', 
+      borderRadius: 8,
+    },
+    indicator: {
+      width: 10,
+      height: '100%', 
+      marginRight: 10,
+      borderRadius: 5, 
+    },
+    itemSeparator: {
+      height: 1,
+      backgroundColor: '#000'
+    },
+    itemInfo: {
+      flex: 1,
+    },
+    itemImage: {
+      width: 80, 
+      height: 80, 
+      borderRadius: 25, 
+    },
+    prnm: {
+      fontSize: 20,
+      fontWeight: 'bold',
+    },
+    deadline:{
+      fontSize: 12,
+      textDecorationLine: 'underline',
+    },
+    deadlinetext:{
+      fontWeight: 'bold',
+    }
+  });
+  
+  export default MainScreen;

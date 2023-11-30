@@ -32,7 +32,7 @@ const ProductRegist = ({ route, navigation }) => {
         });
     setTimeout(() => {
       Alert.alert("등록 성공!");
-      navigation.navigate('MainScreen');
+      navigation.navigate('Mains');
     }, 2000);
   };
   const handleScanAgain = () => {
@@ -48,10 +48,9 @@ const ProductRegist = ({ route, navigation }) => {
         onChangeText={(text) => setProductName(text)}
       />
       <TextInput
-        keyboardType='numeric'
         style={styles.input}
         placeholder="유통기한"
-        value={expiryDate} 
+        value={expiryDate}
         onChangeText={(text) => setExpiryDate(text)}
       />
       <TextInput

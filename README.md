@@ -1,1 +1,2 @@
-# barcoding
+# capstone
+capstone design (bacoding)
