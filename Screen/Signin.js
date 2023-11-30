@@ -22,7 +22,7 @@ export async function signin(email, password) {
     } else {
       // 기타 로그인 오류 처리
       console.log(error.message);
-      Alert.alert("로그인 중 오류가 발생했습니다.");
+      //Alert.alert("로그인 중 오류가 발생했습니다.");
    } 
  }
 }

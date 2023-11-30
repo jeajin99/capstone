@@ -100,6 +100,7 @@ const MainScreen = () => {
         data: data.brnum,
         deadline: data.deadline,
         docId: doc.id,
+        img: data.image
          });
       });
   
@@ -142,7 +143,7 @@ const MainScreen = () => {
   );
 };
 
-const Header = ({ onSearchPress, selectedCategory, categories, onSelectCategory }) => (
+const Header = ({ onSearchPress, selectedCategory,  onSelectCategory }) => (
   <View style={Styles.topRow}>
     <TouchableOpacity onPress={() => onSelectCategory(category)}>
       <Text style={Styles.logo}>{selectedCategory}</Text>
@@ -182,22 +183,32 @@ const ScannedItemList = ({ scannedItems, onDeleteItem }) => (
       const dday = calculateDday(item.deadline);
       const indicatorColor = getIndicatorColor(dday);
       const deadlineText = getDeadlineText(dday);
+      const img = {
+        단백질바 : require("../assets/P8801117478100.jpg"),
+        신라면  :  require("../assets/신라면.jpg"),
+        콘푸라이트 : require("../assets/콘푸라이트.jpg"),
+        서울우유_딸기 : require("../assets/딸기우유.jpg"),
+        서울우유_초콜릿 : require("../assets/초코우유.jpg"),
+      }
+      const imageSource = img[item.prnm];
+      console.log("Image Source Path:", imageSource);
       return (
         <TouchableOpacity onLongPress={() => onDeleteItem(item.docId)}>
-        <View style={Styles.scannedItem}>
-          <View style={[Styles.indicator, { backgroundColor: indicatorColor }]} />
-          <View style={Styles.itemInfo}>
-            <Text style={Styles.deadline}>{`${item.deadline}`}</Text>
-            <Text style={Styles.prnm}>{`${item.prnm}`}</Text>
-            <Text>{`${item.data}`}</Text>
-            <Text style={Styles.deadlinetext}>{deadlineText}</Text>
+          <View style={Styles.scannedItem}>
+            <View style={[Styles.indicator, { backgroundColor: indicatorColor }]} />
+            <View style={Styles.itemInfo}>
+              <Text style={Styles.deadline}>{`${item.deadline}`}</Text>
+              <Text style={Styles.prnm}>{`${item.prnm}`}</Text>
+              <Text>{`${item.data}`}</Text>
+              <Text style={Styles.deadlinetext}>{deadlineText}</Text>
+            </View>
+            <Image style={Styles.itemImage} source={imageSource} />
           </View>
-          <Image style={Styles.itemImage} source={require('../assets/post.png')} />
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
       );
     }}
     ItemSeparatorComponent={() => <View style={Styles.itemSeparator} />}
+    showsVerticalScrollIndicator={false}
   />
 );
 

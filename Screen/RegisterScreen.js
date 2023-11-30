@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { registration } from './Registration';
 
@@ -9,7 +9,7 @@ const RegisterScreen = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordsMatch, setPasswordsMatch] = useState(true);
-
+  const [emailError, setEmailError] = useState('');
 
   const navigation = useNavigation();
 
@@ -18,15 +18,34 @@ const RegisterScreen = () => {
   };
 
   const handleSignup = async () => {
-    const success = await registration(nickName ,email, password);
-    if (success) {
-      navigation.navigate("Initial")}
-  }
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError('이메일 형식이 올바르지 않습니다.');
+      return;
+    } else {
+      setEmailError('');
+    }
 
+    // Password match validation
+    if (!passwordsMatch) {
+      Alert.alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('비밀번호는 최소 6자 이상이어야 합니다.');
+      return;
+    }
+
+    const success = await registration(nickName, email, password);
+    if (success) {
+      navigation.navigate('Initial');
+    }
+  };
 
   const handlePasswordChange = text => {
     setPassword(text);
-    // 비밀번호가 변경될 때마다 두 비밀번호를 비교
     if (confirmPassword !== '' && text !== confirmPassword) {
       setPasswordsMatch(false);
     } else {
@@ -36,7 +55,6 @@ const RegisterScreen = () => {
 
   const handleConfirmPasswordChange = text => {
     setConfirmPassword(text);
-    // 비밀번호 확인이 변경될 때마다 두 비밀번호를 비교
     if (password !== '' && text !== password) {
       setPasswordsMatch(false);
     } else {
@@ -56,47 +74,50 @@ const RegisterScreen = () => {
       </View>
       <View style={styles.formArea}>
         <TextInput
-            style={styles.textForm}
-            placeholder={'이메일'}
-            onChangeText={text => setEmail(text)}
-            keyboardType="email-address"
+          style={styles.textForm}
+          placeholder={'이메일'}
+          onChangeText={text => setEmail(text)}
+          keyboardType="email-address"
         />
-     <TextInput
-        style={styles.textForm}
-        secureTextEntry={true}
-        placeholder={'비밀번호(8자 이상)'}
-        onChangeText={handlePasswordChange}
-        value={password}
-      />
-      <TextInput
-        style={styles.textForm}
-        secureTextEntry={true}
-        placeholder={'비밀번호 확인'}
-        onChangeText={handleConfirmPasswordChange}
-        value={confirmPassword}
-      />
-      {!passwordsMatch && (
-        <View style={styles.validationMessage}>
-          <Text style={styles.TextValidation}>
-            비밀번호가 일치하지 않습니다.
-          </Text>
+        {emailError !== '' && (
+          <View style={styles.validationMessage}>
+            <Text style={styles.TextValidation}>{emailError}</Text>
+          </View>
+        )}
+        <TextInput
+          style={styles.textForm}
+          secureTextEntry={true}
+          placeholder={'비밀번호(8자 이상)'}
+          onChangeText={handlePasswordChange}
+          value={password}
+        />
+        <TextInput
+          style={styles.textForm}
+          secureTextEntry={true}
+          placeholder={'비밀번호 확인'}
+          onChangeText={handleConfirmPasswordChange}
+          value={confirmPassword}
+        />
+        {!passwordsMatch && (
+          <View style={styles.validationMessage}>
+            <Text style={styles.TextValidation}>
+              비밀번호가 일치하지 않습니다.
+            </Text>
+          </View>
+        )}
       </View>
-      )}
-    </View>
       <View style={styles.formArea}>
-      <TextInput
-            style={styles.textForm}
-            placeholder={'닉네임'}
-            onChangeText={text => setNickName(text)}
+        <TextInput
+          style={styles.textForm}
+          placeholder={'닉네임'}
+          onChangeText={text => setNickName(text)}
         />
         <View style={styles.pickerSelect}>
           {/* RNPickerSelect 컴포넌트 스타일 */}
         </View>
       </View>
       <View style={styles.validationMessage}>
-        <Text style={styles.TextValidation}>
-          에러 메시지가 여기에 표시됩니다.
-        </Text>
+        {/* General validation message goes here */}
       </View>
       <View style={styles.buttonArea}>
         <TouchableOpacity style={styles.button} onPress={handleSignup}>
@@ -106,7 +127,6 @@ const RegisterScreen = () => {
     </View>
   );
 };
-
 const styles = {
     container: {
       flex: 1,
@@ -168,8 +188,14 @@ const styles = {
       fontSize: 40,
       fontWeight: 'bold',
     },
-    pickerSelect: {
-      // RNPickerSelect 스타일
+    validationMessage: {
+      justifyContent: 'center',
+      marginVertical: 5,
+    },
+    TextValidation: {
+      color: 'red',
+      fontSize: 14,
+      textAlign: 'center',
     },
   };
   
