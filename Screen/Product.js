@@ -8,33 +8,55 @@ import { useRoute } from '@react-navigation/native';
 
 const ProductRegist = ({ route, navigation }) => {
   const [productName, setProductName] = useState(route.params.barcodeData.prnm || '');
-  const [expiryDate, setExpiryDate] = useState(route.params.barcodeData.deadline || '');
+  const [expiryDate, setExpiryDate] = useState('');
   const [categ, setCate] = useState('');
+  const [dateError, setDateError] = useState('');
+
+  const sanitizeProductName = (name) => {
+    return name.replace(/\s+/g, '_');
+  };
+
   const handleRegistration = async () => {
+    // Validate date format (YYYY-MM-DD)
+    const dateRegex = /^\d{4}\d{2}\d{2}$/;
+    if (!expiryDate.match(dateRegex)) {
+      setDateError('날짜 형식이 올바르지 않습니다. (YYYYMMDD)');
+      return;
+    }
+
+    // Reset date error when a valid date is entered
+    setDateError('');
+
+    const sanitizedProductName = sanitizeProductName(productName);
+
     try {
-      await AsyncStorage.setItem('productName', productName);
+      await AsyncStorage.setItem('productName', sanitizedProductName);
       await AsyncStorage.setItem('expiryDate', expiryDate);
     } catch (e) {
       console.error('Error saving data to AsyncStorage:', e);
     }
+
     const currentUser = firebase.auth().currentUser;
     const db = firebase.firestore();
     db.collection("users")
-        .doc(currentUser.uid)
-        .collection("product")
-        .doc("cate")
-        .collection(categ)
-        .add({
-            prname : productName,
-            brnum : route.params.barcodeData.data,
-            deadline : expiryDate,
-            cate : categ
-        });
+      .doc(currentUser.uid)
+      .collection("product")
+      .doc("cate")
+      .collection(categ)
+      .add({
+        prname: sanitizedProductName,
+        brnum: route.params.barcodeData.data,
+        deadline: expiryDate,
+        cate: categ,
+        image: `P${route.params.barcodeData.data}.jpg`
+      });
+
     setTimeout(() => {
       Alert.alert("등록 성공!");
       navigation.navigate('Mains');
     }, 2000);
   };
+
   const handleScanAgain = () => {
     navigation.replace('Scanner', { scanned: false });
   };
@@ -49,10 +71,11 @@ const ProductRegist = ({ route, navigation }) => {
       />
       <TextInput
         style={styles.input}
-        placeholder="유통기한"
+        placeholder="유통기한 (예: YYYY-MM-DD)"
         value={expiryDate}
         onChangeText={(text) => setExpiryDate(text)}
       />
+      {dateError ? <Text style={styles.errorText}>{dateError}</Text> : null}
       <TextInput
         style={styles.input}
         placeholder="카테고리"
@@ -64,7 +87,7 @@ const ProductRegist = ({ route, navigation }) => {
           <Text style={styles.buttonText}>등록하기</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleScanAgain}>
-          <Text style={styles.buttonText}>스캔다시하기</Text>
+          <Text style={styles.buttonText}>스캔 다시하기</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -83,6 +106,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 16,
     paddingHorizontal: 10,
+    color: 'black',
   },
   button: {
     backgroundColor: 'black',
@@ -99,6 +123,10 @@ const styles = StyleSheet.create({
   },
   buttonArea: {
     alignItems: 'center',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
   },
 });
 
